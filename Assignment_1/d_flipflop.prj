@@ -1,0 +1,3 @@
+verilog work "sr_latch.v"
+verilog work "d_latch.v"
+verilog work "d_flipflop.v"
