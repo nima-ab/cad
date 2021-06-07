@@ -19,7 +19,7 @@
 //
 //////////////////////////////////////////////////////////////////////////////////
 module ControlUnit(
-    input opcode,
+    input [5:0] opcode,
 	 output reg reg_dst, //how the destination register is specified : 0 rt 1 rd
 	 output reg reg_write, //enables a write to one of the registers
 	 
@@ -31,8 +31,7 @@ module ControlUnit(
 
     output reg mem_read, //enables a memory read for load instructions
     output reg mem_write, //enables a memory write for store instructions
-	 output reg mem_to_reg, //where the value to be written comes from : 0 alu result 1 memory
-	 output reg jump
+	 output reg mem_to_reg //where the value to be written comes from : 0 alu result 1 memory
     );
 	 
 	 always @(*)  
@@ -73,7 +72,37 @@ module ControlUnit(
 								mem_to_reg = 0;
 							end
 						
-						6'b001000 || 6'b001100 || 6'b001101 || 001110: //addi, andi, ori, xori
+						6'b001000: // addi
+							begin
+								reg_write = 1;
+								alu_src = 1;
+								branch = 0;
+								mem_read = 0;
+								mem_write = 0;
+								mem_to_reg = 0;
+							end
+							
+						6'b001100: // andi
+							begin
+								reg_write = 1;
+								alu_src = 1;
+								branch = 0;
+								mem_read = 0;
+								mem_write = 0;
+								mem_to_reg = 0;
+							end
+							
+						6'b001101: // ori
+							begin
+								reg_write = 1;
+								alu_src = 1;
+								branch = 0;
+								mem_read = 0;
+								mem_write = 0;
+								mem_to_reg = 0;
+							end
+							
+						6'b001110: //xori
 							begin
 								reg_write = 1;
 								alu_src = 1;
@@ -83,7 +112,7 @@ module ControlUnit(
 								mem_to_reg = 0;
 							end
 						
-						6'b000100 || 6'b000101: //beq, bne
+						6'b000100: //beq 
 							begin
 								reg_write = 0;
 								alu_src = 0;
@@ -93,7 +122,17 @@ module ControlUnit(
 								mem_to_reg = 0;
 							end
 							
-						6'b01111: //lui ??
+						6'b000101://bne
+							begin
+								reg_write = 0;
+								alu_src = 0;
+								branch = 1;
+								mem_read = 0;
+								mem_write = 0;
+								mem_to_reg = 0;
+							end
+							
+						6'b01111: //lui
 							begin
 								reg_write = 1;
 								alu_src = 1;
@@ -102,6 +141,7 @@ module ControlUnit(
 								mem_write = 0;
 								mem_to_reg = 0;
 							end
+							default: reg_write = 0; 
 						endcase
 				end
 				

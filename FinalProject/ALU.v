@@ -35,10 +35,13 @@ module ALU(
     input [31:0] b,
     input [3:0] alu_sel,
     output [31:0] alu_out,
-    output c_out
+    output zero
     );
 	 reg [31:0] alu_res;
+	 wire signed [31:0] signed_a;
+	 assign signed_a = a;
 	 assign alu_out = alu_res;
+	 assign zero = alu_res == 31'b0;
 	 integer tmp, i;
 	always @(*)
 		 begin
@@ -60,13 +63,7 @@ module ALU(
 				4'b0111: // srl
 				  alu_res = a>>b;
 				 4'b1000: // sra
-					begin
-						tmp = a;
-						for (i = b; i > 0; i = i - 1) begin
-							tmp = {tmp[31],tmp[31:1]};
-						end
-					alu_res = tmp;
-					end
+					alu_res = a>>>b;
 				 default: alu_res = a + b ; 
 			  endcase
 		 end
