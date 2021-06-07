@@ -32,18 +32,26 @@ module RegisterFile(
       input          [4:0]     reg_read_addr_2,  
       output         [31:0]    reg_read_data_2 
     );
-      wire     [31:0]     register [31:0];  
+      reg     [31:0]     register [31:0];  
 		
 		//write
-		assign register[0] = rst ? 16'b0 : reg_write_en & (reg_write_dest == 3'b000)? reg_write_data : register[0];
-		assign register[1] = rst ? 16'b0 : reg_write_en & (reg_write_dest == 3'b001)? reg_write_data : register[1];
-		assign register[2] = rst ? 16'b0 : reg_write_en & (reg_write_dest == 3'b001)? reg_write_data : register[2];
-		assign register[3] = rst ? 16'b0 : reg_write_en & (reg_write_dest == 3'b001)? reg_write_data : register[3];
-		assign register[4] = rst ? 16'b0 : reg_write_en & (reg_write_dest == 3'b001)? reg_write_data : register[4];
-		assign register[5] = rst ? 16'b0 : reg_write_en & (reg_write_dest == 3'b001)? reg_write_data : register[5];
-		assign register[6] = rst ? 16'b0 : reg_write_en & (reg_write_dest == 3'b001)? reg_write_data : register[6];
-		assign register[7] = rst ? 16'b0 : reg_write_en & (reg_write_dest == 3'b001)? reg_write_data : register[7];
-			
+		always @ (posedge clk or posedge rst) begin  
+           if(rst) begin  
+                register[0] <= 16'd0;  
+                register[1] <= 16'd0;  
+                register[2] <= 16'd0;  
+                register[3] <= 16'd0;  
+                register[4] <= 16'd0;  
+                register[5] <= 16'd0;  
+                register[6] <= 16'd0;  
+                register[7] <= 16'd0;       
+           end  
+           else begin  
+                if(reg_write_en) begin  
+                     register[reg_write_dest] <= reg_write_data;  
+                end  
+           end  
+      end  
 		//read
 		assign reg_read_data_1 = register[reg_read_addr_1];
 		assign reg_read_data_2 = register[reg_read_addr_2];
