@@ -39,15 +39,38 @@ module MIPS(
 	 wire [31:0] data_from_mem;
 	 wire [31:0] sign_extend;
 	 wire [31:0] zero_extend;
-	 assign pc = 32'd0;
 	 assign rst = 1;
 	 assign zero_extend = {{16{1'b0}},instruction[15:0]}; 
 	 assign sign_extend = {{16{instruction[15]}},instruction[15:0]}; 
-	 //wire [31:0] pc_curr, pc_nxt;
 	 
-	//ProgramCounter p_counter( .clk(clk), .rst(rst), .pc_in(pc_curr), .pc_out(pc_nxt));
+	 reg [31:0] pc_curr;
+	 wire [31:0] pc_nxt, pc4;
 	 
-	InstructionMemory instr_mem(.pc(pc), .instruction(instruction));
+	 wire [31:0] sign_extend_shift_2, pc_branch;
+	 wire [31:0] no_sign_extend;  
+	 wire beq_control, bne_control;
+
+	 assign pc4 = pc_curr + 32'd4;
+	 
+	 assign beq_control = branch & alu_zero;
+	 assign bne_control = branch & ~alu_zero;
+	 
+	 
+	 assign branch_control = beq_control | bne_control;
+	 assign pc_nxt = (branch_control == 1'b1) ? pc_branch : pc4;  
+	 assign sign_extend_shift_2 = {sign_extend[29:0],2'b0};  
+	 assign no_sign_extend = ~sign_extend_shift_2 + 1'b1;
+	 assign pc_branch = (sign_extend_shift_2[31] == 1'b1) ? (pc4 - no_sign_extend): (pc4 + sign_extend_shift_2);  
+
+	 always @(posedge clk or posedge rst)  
+		begin   
+      if(rst)   
+           pc_curr <= 32'd0;  
+      else  
+           pc_curr <= pc_nxt;  
+		end  
+	 
+	InstructionMemory instr_mem(.pc(pc_curr), .instruction(instruction));
 	ControlUnit control_unit(.opcode(instruction[31:26]),
 		.reg_dst(reg_dst),
 		.reg_write(reg_write),

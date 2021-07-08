@@ -48,6 +48,7 @@ module RegisterFile(
            end  
            else begin  
                 if(reg_write_en) begin  
+							$monitor("%d clock", clk);
                      register[reg_write_dest] <= reg_write_data;  
                 end  
            end  
